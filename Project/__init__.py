@@ -31,4 +31,7 @@ def create_app():
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    from .inbound import inbound as inbound_blueprint
+    app.register_blueprint(inbound_blueprint)
+
     return app

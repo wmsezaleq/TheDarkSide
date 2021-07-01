@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\faste\Desktop\TheDarkSide"
+VIRTUAL_ENV="C:\Users\faste\Documents\GitHub\TheDarkSide"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

@@ -6,6 +6,7 @@ from . import db
 
 auth = Blueprint('auth', __name__)
 
+# GET METHODS
 @auth.route('/login')
 def login():
     return render_template("no-logged/login.html")
@@ -57,8 +58,8 @@ def login_post():
     if not user or not check_password_hash(user.password, password):
         flash("badCredentials")
         return redirect(url_for('auth.login'))
-
+    # Sino, logeo el usuario
     login_user(user, remember=remember)
-    return redirect(url_for('main.profile'))
+    return redirect(url_for('main.dashboard'))
 
 

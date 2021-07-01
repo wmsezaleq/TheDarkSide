@@ -15,9 +15,11 @@
         <h1 class="h3 mb-3 fw-normal">Iniciar sesión</h1>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div class="bg-danger mb-4">
-                    <span style="color: white">Credenciales incorrectas, por favor verifiquelas.</span>
-                </div>
+                {% if messages[0] == "badCredentials" %}
+                    <div class="bg-danger mb-4">
+                        <span style="color: white">Credenciales incorrectas, por favor verifiquelas.</span>
+                    </div>
+                {% endif %}
             {% endif %}
         {% endwith %}
         <div class="form-floating">
