@@ -24,6 +24,12 @@ def receive_order():
 
 
 
+# Test para Sendyk
+@inbound.route('/receive_caca')
+@login_required
+def receive_caca():
+    return render_template("logged/inbound/recepcion_caca.html")
+
 @inbound.route('/receive_order', methods=["POST"])
 @login_required
 def post_receive_order():
