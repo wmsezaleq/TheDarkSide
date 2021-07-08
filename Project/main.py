@@ -1,30 +1,9 @@
-from .auth import login
-from flask import Blueprint, render_template, redirect, url_for
-from flask_login import login_required, current_user
-from . import db
+from flask_socketio import SocketIO
+from app import create_app, io
 
-main = Blueprint('main', __name__)
 
-@main.route('/')
-def index():
-    try:
-        if current_user.name:
-            return redirect(url_for("main.dashboard"))
-    except:
-        pass
-    return render_template("no-logged/index.html")
+app = create_app()
 
-@main.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template("logged/dashboard.html", name=current_user.name)
 
-@main.route('/profile')
-@login_required
-def profile():
-    return render_template("logged/profile.html", name=current_user.name)
-
-@main.route('/test')
-def test():
-    return render_template("test.html")
-
+if __name__ == "__main__":
+    io.run(app, debug=True)
