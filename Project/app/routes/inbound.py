@@ -2,12 +2,12 @@ from flask import Blueprint, render_template, request
 from flask.helpers import url_for
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
-from .models import User, Providers, SKU, BuyOrder
-from . import db
+from ..models import User, Providers, SKU, BuyOrder, ReceiptOrder
+from .. import db
 from datetime import datetime
 inbound = Blueprint('inbound', __name__)
 
-# Nueva orden
+# Recepción de órdenes
 @inbound.route('/receive_order')
 @login_required
 def receive_order():
@@ -22,15 +22,18 @@ def receive_order():
     
     return render_template("logged/inbound/receive_order.html", name=current_user.name, SKU_list=SKU_list, provider_list=providers_list)
 
-
-
-# Test para Sendyk
-@inbound.route('/receive_caca')
+@inbound.route('/put_away')
 @login_required
-def receive_caca():
-    return render_template("logged/inbound/recepcion_caca.html")
+def put_away():
+    return render_template("logged/inbound/put_away.html", name=current_user)
 
 @inbound.route('/receive_order', methods=["POST"])
 @login_required
 def post_receive_order():
-    pass
+    userID = User.get_id(current_user) # type: str
+    totalReceipt = ReceiptOrder.query.filter_by(userID=userID).count() #type: int
+    ReceiptOrder(
+        IDReceipt=totalReceipt+1,
+        userID=userID,
+        date=datetime.now()
+    )

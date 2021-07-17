@@ -3,7 +3,7 @@ from flask_login.login_manager import LoginManager
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+db = SQLAlchemy(session_options={"autoflush":False})
 io = SocketIO()
 
 def create_app():
@@ -31,10 +31,15 @@ def create_app():
     app.register_blueprint(auth_blueprint)
 
     # Template para las que no sean de auth
-    from .main import main as main_blueprint
+    from .routes.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from .inbound import inbound as inbound_blueprint
+    from .routes.inbound import inbound as inbound_blueprint
     app.register_blueprint(inbound_blueprint)
+
+    from .routes.abm import abm as abm_blueprint
+    app.register_blueprint(abm_blueprint)
+
+    from .ioRoutes import abm as abm_ioblueprint
 
     return app

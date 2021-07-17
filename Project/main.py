@@ -1,4 +1,3 @@
-from flask_socketio import SocketIO
 from app import create_app, io
 
 

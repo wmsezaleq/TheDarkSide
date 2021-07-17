@@ -4,23 +4,14 @@ function addRow(newIndex) {
             <td>
                 <div class="form-check form-switch">
                     <input  type="checkbox" index="${newIndex}" name="auto${newIndex}" class="form-check-input" checked>
-                    <label for="auto" class="form-check-label">Auto</label>
+                    <label for="auto" class="form-check-label">Au   to</label>
                 </div>
             </td>
             <td>
                 <input type="text" list="SKUs" index="${newIndex}" name="SKU${newIndex}" class="form-control input-sm" disabled>
-                <div index="${newIndex}" class="error-feedback text-start">
-                    Formato inválido
-                </div>
-                <div index="${newIndex}" class="warning-feedback text-start">
-                    SKU inexistente, creado
-                </div>
             </td>
             <td>
                 <input class="form-control" list="Descriptions" input-sm" index="${newIndex}" name="description${newIndex}" type="text" required>
-                <div index="${newIndex}" class="warning-feedback text-start">
-                    No existe la descripción
-                </div>
             </td>
             <td><input class="form-control input-sm" index="${newIndex}" name="quantity${newIndex}" type="number" required></td>
             <td>
@@ -132,8 +123,6 @@ function reloadFunctions() {
                 SKUObj.val("");
             }
         }
-        // div_warning.show();
-
     }
 
     $("input[name*='description']").keyup(function () {
