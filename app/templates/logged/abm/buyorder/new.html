@@ -1,0 +1,163 @@
+{% extends "logged/base_navbar_logged.html" %}
+
+{% block head %}
+<title>Nueva orden de compra</title>
+<script>
+    var SKU_list={{SKU_list|tojson}};
+    const userID = {{userID}};
+</script>
+<script src="{{url_for('static',filename='js/abm/buy_order.js')}}"></script>
+{% endblock %}
+
+{% block abm %}
+active
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pb-3">
+    <div class="row">
+        <div class="col">
+            <h2 class="pb-3">Nueva orden de compra</h2>
+        </div>
+        <div class="col-1 text-end">
+            <h6>
+                <span class="text">Total Q</span>
+                <span class="q"></span>
+
+            </h6>
+        </div>
+        <div class="col-1 text-end">
+            <h6>
+                <span class="text">Total</span>
+                <span class="price-tag">$</span>
+                <span class="price"></span>
+            </h6>
+        </div>
+        <div class="col text-end">
+            <button form="form" class="text-end btn btn-primary">Confirmar orden</button>
+        </div>
+    </div>
+    <hr class="dropdown-divider">
+
+</div>
+<div class="container-fluid text-center">
+    <form id="form" method="POST" action="{{url_for('abm_buyorder.post_new')}}" autocomplete="off">
+        <h6 class="text-start">Datos de compra</h6>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="date">Fecha</span>
+                    <input type="date" class="form-control" name="date" aria-describedby="date" required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group mb-3">
+                    <span class="input-group-text is-invalid">Proveedor</span>
+                    <input type="text" class="form-control" list="list-providers" name="providers" id="providers" required>
+                </div>
+                <datalist id="list-providers">
+                    {% for item in provider_list %}
+                        <option value="{{item}}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
+        </div>
+        <hr>
+        <!-- Data Lists -->
+        <datalist id="SKUs">
+            {% for IDSKU in SKU_list %}
+            <option value="{{IDSKU}}">
+            {% endfor %}
+        </datalist>
+        <datalist id="Descriptions">
+            {% for IDSKU in SKU_list %}
+            <option value="{{SKU_list[IDSKU]['Descripcion']}}">
+            {% endfor %}
+        </datalist>
+        <!--  División de tabla -->
+        <h6 class="text-start">Productos en la orden</h6>
+        <div class="table-responsive"></div>
+            <table class="table text-start">
+                <thead>
+                    <tr class="align-middle">
+                        <th style="width: 10em;">EAN/SKU</th>
+                        <th style="width: 50em;">Descripción</th>
+                        <th style="width: 5em;">Cantidad</th>
+                        <th style="width: 7em;">Precio Br $</th>
+                        <th style="width: 4em;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="align-middle" index="0">
+                        <td>
+                            <div class="row">
+                                <div class="col-10 form-group">
+                                    <input type="text" index="0" list="SKUs" name="SKU0" data-bs-toggle="tooltip" data-bs-placement="top" title="Saraza" class="form-control input-sm" required>
+                                </div>
+                                <div name = "skuAdd0"  style="display: none" class="col-2 ps-2 pt-1">
+                                    <button type="button" data-bs-toggle="modal" data-bs-target="#newSKUModal" name="addSKU" style="cursor: pointer; background-color: transparent; border: none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="row">
+                                <div class="col-11 form-group">
+                                    <input class="form-control input-sm" list="Descriptions" index="0" name="description0" type="text" required>
+                                </div>
+                                <div name="descriptionAdd0" style="display: none" class="col-1 ps-2 pt-1">
+                                    <button type="button" data-bs-toggle="modal" data-bs-target="#newSKUModal" name="addSKU" style="cursor: pointer; background-color: transparent; border: none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                        
+                        <td><input class="form-control input-sm" index="0" name="quantity0" type="number" required></td>
+                        <td><input class="form-control input-sm" index="0" name="price0" type="number" required></td>
+                    </tr>
+                </tbody>
+            </table>
+    </form>
+    <button class="btn btn-primary" id="newRow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+          </svg>
+        Nueva fila
+    </button>
+</div>
+<div class="modal fade" id="newSKUModal" tabindex="-1" aria-labelledby="newSKUModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="newSKUModal">Añadir nuevo SKU</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <label for="description" class="form-label">Descripción</label>
+            <div class="input-group pb-2">
+                <input type="text" class="form-control" id="description" placeholder="Ejemplo: Pilas AAA Duracell">
+
+            </div>
+
+            <div class="mb-3">
+                <label for="price" class="form-label">Precio en $</label>
+                <input type="number" class="form-control" id="price">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" id="saveNewSKU" class="btn btn-dark">Guardar SKU</button>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
