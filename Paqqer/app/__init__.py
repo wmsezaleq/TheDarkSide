@@ -12,7 +12,7 @@ def create_app():
     app = Flask(__name__)
 
     app.config["SECRET_KEY"] = "abcdefghijklmnñopqrstuvwxyz1234567890ABCDEFGHIJKNMLOPQRSTUVWXYZslipKnot!2123#"
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///data/db.sqlite'
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql://ezeaquev:metallicarules32@paqqer.com/Paqqer'
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False # Deshabilito la función deprecada para debug
     db.init_app(app)
 
