@@ -1,0 +1,30 @@
+{% extends "logged/environ/base_navbar_logged.html" %}
+
+{% block head %}
+<title>📄Posiciones · Depósito</title>
+<script>
+    $(function(){
+        $("button").click(function(){
+            $(".navbar").hide();
+            $(".btn").hide();
+            $("div[name='print']").show();
+            window.print();
+            $(".navbar").show();
+            $(".btn").show();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+    <div class="container text-center">
+        <button class="btn btn-dark">🖨 Imprimir</button>
+        <a class="btn btn-dark" href="{{url_for('abm_deposit.index')}}">Volver</a>
+        <div name="print"> 
+            {% for barcode in barcodes %}
+            
+            <img height="50%" src="data:image/png;base64,{{barcode.decode()}}" alt="">
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

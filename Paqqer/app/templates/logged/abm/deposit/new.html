@@ -1,0 +1,147 @@
+{% extends "logged/environ/base_navbar_logged.html" %}
+ 
+{% block head %}
+<title>Depósito · ABM</title>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+<script src="{{url_for('static',filename='js/abm/deposit/wh_module.js')}}"></script>
+<script src="{{url_for('static',filename='js/abm/deposit/wh_gen.js')}}"></script>
+<script>
+    var userID = {{userID}};
+    var modeData = {{mode|tojson}};
+</script>
+<script src="{{url_for('static',filename='js/abm/deposit/deposit.js')}}"></script>
+<script>
+    socketio.on("layout_getBack", function(){
+        window.location.replace("{{url_for('abm_deposit.index')}}")
+    });
+</script>
+
+<style>
+    .container{
+        max-width: 35em !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<form action="" method="post" name="generation" class="container text-center pt-1 btn-dark">
+    <div class="row">
+        <div class="form-box col">
+            <h3>¡Vamos a diagramar tu depósito!</h3>
+            <h6>Dimensiones</h6>
+        </div>
+    </div>
+    <div class="row pb-2">
+        <div class="col">
+            <div class="form-group">
+                <label for="whname" class="form-label">Nombre del depósito</label>
+                <input id="whname" type="text" class="form-control" required>
+            </div>
+        </div>
+    </div>
+    <div class="row pb-2">
+        <div class="col">
+            <div class="form-group">
+                <label class="form-label" for="ancho">Ancho</label>
+                <input class="form-control" type="number" min="0" required id="ancho">
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label class="form-label" for="alto">Alto</label>
+                <input class="form-control" type="number" min="0" required id="alto">
+            </div>
+        </div>
+    </div>
+    <div class="row pb-2">
+        <div class="form-group">
+            <label for="niveles" class="form-label">Cantidad de niveles de altura</label>
+            <input type="number" id="niveles" min="0" required class="form-control">
+        </div>
+    </div>
+    <div class="row pb-3">
+        <div class="col">
+            <button id="generateLayout" type="button" class="btn btn-primary">Generar Layout</button>
+        </div>
+    </div>
+</form>
+
+
+
+<!-- Layout  -->
+<div class="text-center" style="display: none;" name="layout">
+    <div class="row">
+        <div class="col">
+            <h1 name="whname"></h1>
+        </div>
+    </div>
+    <div class="row align-items-center"> 
+        <div class="col">
+            <button name="confirmLayout" class="btn btn-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                </svg>
+                Confirmar layout de depósito
+            </button>
+        </div>
+    </div>
+    <div class="table-responsive pt-3">
+        <table class="table table-dark table-striped">
+            <thead>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">Agregar columna</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <p>Seleccione en qué dirección desea <strong>insertar</strong> la nueva columna o <strong>eliminar</strong></p>
+            <div class="container text-center">
+                <div class="row pb-2">
+                    <div class="col">
+                        <button type="button" id="insR" class="btn btn-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                            </svg>
+                            Insertar columna a la izquierda
+                        </button>
+                    </div>
+                    <div class="col">
+                        <button type="button" id="insL" class="btn btn-success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                            </svg>
+                            Insertar columna a la derecha
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button type="button" id="delCol" class="btn btn-danger">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                            </svg>
+                            Eliminar columna
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

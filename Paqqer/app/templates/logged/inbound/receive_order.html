@@ -1,0 +1,156 @@
+{% extends "logged/environ/base_navbar_logged.html" %}
+
+{% block head %}
+<title>Nueva orden</title>
+<style>
+    .warning-feedback{
+        display: none;
+        color: black;
+    }
+    .error-feedback{
+        display: none;
+        background-color: #DC3545;
+        color: #F6F2FF;
+    }
+</style>
+<script>
+    const SKU_list={{SKU_list|tojson}};
+</script>
+
+<script src="{{url_for('static',filename='js/inbound/receive_order.js')}}"></script>
+{% endblock %}
+
+{% block receiving %}
+active
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid pb-3">
+    <div class="row">
+        <div class="col">
+            <h2 class="pb-3">Crear orden de compra</h2>
+        </div>
+        <div class="col text-end">
+            <button form="form" class="text-end btn btn-primary">Confirmar orden</button>
+        </div>
+    </div>
+    <hr class="dropdown-divider">
+
+</div>
+<div class="container-fluid text-center">
+    <form id="form" method="POST" action="/receive_order" autocomplete="off">
+        <h6 class="text-start">Datos de compra</h6>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="date">Fecha</span>
+                    <input type="date" class="form-control" name="date" aria-describedby="date" required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group mb-3">
+                    <span class="input-group-text is-invalid">Proveedor</span>
+                    <input type="text" class="form-control" list="list-providers" name="providers" id="providers" required>
+                    <div id="provider-warning" class="warning-feedback text-start">
+                        El proveedor no existe, se creará uno nuevo.
+                    </div>
+                </div>
+                <datalist id="list-providers">
+                    {% for item in provider_list %}
+                        <option value="{{item}}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col"> 
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">ID de compra   </span>
+                            <input type="text" class="form-control" list="list-IDBuy" name="IDBuy" id="IDBuy" required>
+                        </div>
+                        <datalist id="list-IDBuy">
+                            {% for item in IDBuy_list %}
+                                <option value="{{item}}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group mb-3 ">
+                            <span class="input-group-text" >ID de recepción</span>
+                            <input type="text" class="form-control" list="list-IDReceipt" name="IDReceipt" id="IDReceipt" required>
+                        </div>
+                        <datalist id="list-IDReceipt">
+                            {% for item in IDReceipt_list %}
+                                <option value="{{item}}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                </div>
+    
+                </div>
+            </div>
+        </div>
+        <hr>
+        <!-- Data Lists -->
+        <datalist id="SKUs">
+            {% for IDSKU in SKU_list %}
+            <option value="{{IDSKU}}">
+            {% endfor %}
+        </datalist>
+        <datalist id="Descriptions">
+            {% for IDSKU in SKU_list %}
+            <option value="{{SKU_list[IDSKU]}}">
+            {% endfor %}
+        </datalist>
+        <!--  División de tabla -->
+        <h6 class="text-start">Productos en la orden</h6>
+        <div class="table-responsive"></div>
+            <table class="table text-start align-middle">
+                <thead>
+                    <th style="width: 5em;"></th>
+                    <th style="width: 10em;">EAN/SKU</th>
+                    <th style="width: 50em;">Descripción</th>
+                    <th style="width: 5em;">Cantidad</th>
+                    <th style="width: 4em;"></th>
+                </thead>
+                <tbody>
+                    <tr index="0">
+                        <td>
+                            <div class="form-check form-switch">
+                                <input type="checkbox" name="auto0" index="0" class="form-check-input" checked>
+                                <label for="auto0" class="form-check-label">Auto</label>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" index="0" list="SKUs" name="SKU0" data-bs-toggle="tooltip" data-bs-placement="top" title="Saraza" class="form-control input-sm" disabled>
+                            <div index="0" class="error-feedback text-start">
+                                Formato inválido
+                            </div>
+                            <div index="0" class="warning-feedback text-start">
+                                SKU inexistente, creado
+                            </div>
+                        </td>
+                        <td>
+                            <input class="form-control input-sm" list=Descriptions index="0" name="description0" type="text" required>
+                            <div index="0" class="warning-feedback text-start">
+                                No existe la descripción
+                            </div>
+                        </td>
+                        
+                        <td><input class="form-control input-sm" index="0" name="quantity0" type="number" required></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+    </form>
+    <button class="btn btn-primary" id="newRow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+          </svg>
+        Nueva fila
+    </button>
+
+</div>
+{% endblock %}

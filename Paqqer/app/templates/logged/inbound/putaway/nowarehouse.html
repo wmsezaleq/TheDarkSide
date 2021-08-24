@@ -1,0 +1,10 @@
+{% extends "logged/environ/base_navbar_logged.html" %}
+
+{% block head %}
+<title>Error · PutAway </title>
+{% endblock %}
+
+{% block content %}
+<h2>Actualmente no existe ninguna posición o warehouse.</h2>
+<h6>Para crear uno haga click <a href="{{url_for('abm_deposit.index')}}">aquí</a></h6>
+{% endblock %}

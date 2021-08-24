@@ -1,0 +1,84 @@
+{% extends "logged/environ/base_navbar_logged.html" %}
+
+{% block head %}
+<title>Inbound · PutAway </title>
+<script>
+    $(function(){
+        $("button[name='add']").click(function(){
+            let num = +$("input[name='cantidad']").val() + 1;
+            $("input[name='cantidad']").val(num);
+        });
+        $("button[name='substr']").click(function(){
+            let num = +$("input[name='cantidad']").val() - 1;
+            if (num < 1){
+                num = 1;
+            }
+            $("input[name='cantidad']").val(num);
+        });
+
+        $("input").keyup(function(event){
+            if (event.which == 13){
+                $("form").submit();
+            }
+        });
+    });
+
+</script>
+{% endblock %}
+
+{% block receiving %}
+active
+{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div name="error" class="row align-items-center text-center text-white bg-danger" style="top:0; left:0;position:absolute; height: 100%;width:100%">
+            <div class="col">
+                <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+                <h1 class="pt-2">La posición no existe</h1>
+            </div>
+    </div>
+    <script>
+        $("div[name='error']").delay(1000).fadeOut("slow");
+    </script>
+{% endif %}
+{% endwith %}
+
+<form class="container text-center" method="POST" autocomplete="off" action="{{url_for('putaway.sku', sku=sku.SKUID)}}">
+    <div>
+        <h2>Escanee una posición o ingresela manualmente</h2>
+    </div>
+    <div class="mx-auto" style="width:20%;">
+
+        <input name="posicion" type="text" class="form-control" autocomplete="off"  placeholder="Deposito-Calle-Modulo-Altura">
+    </div>
+    <div class="mb-2">
+        <img width="256px" height="256px" src="data:{{img.mimetype}};base64,{{img.img.decode()}}" alt="SKU Imagen">
+    </div>
+    <div>
+        <q>{{sku.description}}</q>
+    </div>
+    <div>
+        <span>
+            <strong>SKU: </strong> 
+            {{sku.SKUID}}
+        </span>
+    </div>
+    <div class="row text-center mx-auto pb-2" style="width:20%">
+        <div class="col">
+            <button type="button" name="substr" class="btn btn-outline-primary">-</button>
+        </div>
+        <div class="col">
+            <input name="cantidad" class="form-control" type="number" min="1" value="1" style="width:80px">
+        </div>
+        <div class="col">
+            <button type="button" name="add" class="btn btn-outline-primary">+</button>
+        </div>
+    </div>
+    
+</form>
+{% endblock %}

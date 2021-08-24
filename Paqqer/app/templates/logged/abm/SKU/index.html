@@ -1,0 +1,220 @@
+{% extends "logged/environ/base_navbar_logged.html" %}
+
+{% block head %}
+<title>Productos · ABM</title>
+<script type="text/javascript">
+    $(function(){
+        const socketio = io();
+        const userID = {{userID}};
+        $("input[type='checkbox']").change(function(){
+            if ($(this).is(":checked")){
+                $("img").each(function(){
+                    $(this).show();
+                });
+            }
+            else{
+                $("img").each(function(){
+                    $(this).hide();
+                });
+            }
+        });
+
+        $("button[name='newProduct']").click(function(){
+            $("form").attr("action", "{{url_for('abm_products.post_product')}}");
+            $("h5").text("Nuevo producto");
+            $("div[name='SKUID']").hide();
+            $("input[name='descripcion']").val("");
+            $("input[name='precio']").val("");
+
+
+        });
+
+        $("button[name='editProduct']").click(function(){
+            $("form").attr("action", "{{url_for('abm_products.post_editproduct')}}");
+            $("h5").text("Editar producto");
+            $("input[name='descripcion']").val($(this).attr("originalDescripcion"));
+            $("input[name='precio']").val($(this).attr("originalPrecio"));
+            $("input[name='SKUID']").val($(this).attr("originalSKUID"));
+            $("div[name='SKUID']").show();
+
+        });
+        var SKUID_selected = "";
+        $("a[name='delete']").click(function(){
+
+            if(confirm("¿Está segur@ que desea eliminar este SKU?")){
+                SKUID_selected = $(this).attr('SKUID');
+                socketio.emit("productDelete", SKUID_selected, userID);
+            }
+        });
+
+        socketio.on('refreshPage', function(){
+            location.reload();
+        });
+
+        socketio.on('productDeleteAsk', function(){
+            if(confirm("Se encontró una orden de compra con este SKU, la misma se eliminará, ¿está segur@ que desea eliminar este producto?")){
+                socketio.emit("productDeleteConfirm", SKUID_selected, userID);
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="row text-center">
+                <div class="col">&nbsp;</div>
+                <div class="col">&nbsp;</div>
+                <div class="col"></div>
+            </div>
+            <form id="searchForm" action="{{url_for('abm_products.index')}}" method="POST">
+                <div class="row">
+                        <div class="col input-group flex-nowrap">
+                            <span class="input-group-text">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                  </svg>
+                            </span> 
+                            <input form="searchForm" name="search" type="text" class="form-control me-2" type="search">
+                        </div>
+                        <div class="col-md-3">
+                            <select form="searchForm" name="type" class="form-select me-2">
+                                <option value="description" selected>Descripción</option>
+                                <option value="SKUID">SKU</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <button name="newProduct" type="button" data-bs-toggle="modal" data-bs-target="#modalProduct" class="btn btn-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                                <path
+                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
+                            </svg>
+                            Nuevo producto
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid pt-4">
+    <div class="row">
+        <div class="col">
+            <h2>Productos</h2>
+        </div>
+        <div class="col text-center">
+            <div class="form-check form-check-inline form-switch ">
+                <input type="checkbox" id="showImages" class="form-check-input" checked>
+                <label for="showImages" class="form-check-label">Mostrar imágenes</label>
+            </div>
+        </div>
+        <div class="col text-end">
+            <button class="btn btn-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-download" viewBox="0 0 16 16">
+                    <path
+                        d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                    <path
+                        d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                </svg>
+                Exportar
+            </button>
+        </div>
+    </div>
+</div>
+<table class="table table-dark text-center table-striped table-responsive">
+    <thead>
+        <tr>
+            <th style="width:1rem;">SKU</th>
+            <th style="width:18rem;">Imagen</th>
+            <th>Descripción</th>
+            <th>Precio $</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for SKU in data %}
+        <tr class="align-middle">
+            <td>{{SKU}}</td>
+            <td>
+                {% if 'img' in data[SKU]['Foto'] %}
+                <img src="data:{{data[SKU]['Foto']['mimetype']}};base64,{{data[SKU]['Foto']['img'].decode()}}"
+                    height="90px" alt="">
+                {% else %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-image-fill" viewBox="0 0 16 16">
+                    <path d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3zm1 9v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12zm5-6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
+                  </svg>
+                {% endif %}
+
+            </td>
+            <td class="text-wrap">{{data[SKU]["Descripcion"]}}</td>
+            <td>{{data[SKU]["Precio"]}}</td>
+            <td>
+                <button name="editProduct" data-bs-toggle="modal" data-bs-target="#modalProduct" title="Editar producto" class="text-decoration-none btn btn-dark border border-0" originalDescripcion="{{data[SKU]['Descripcion']}}" originalPrecio="{{data[SKU]['Precio']}}" originalSKUID="{{SKU}}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-pencil-square" viewBox="0 0 16 16">
+                        <path
+                            d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                        <path fill-rule="evenodd"
+                            d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                    </svg>
+                </button>
+            </td>
+            <td>
+                <a class="text-decoration-none text-light" name="delete" style="cursor: pointer;" SKUID="{{SKU}}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-trash" viewBox="0 0 16 16">
+                        <path
+                            d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                        <path fill-rule="evenodd"
+                            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                    </svg>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div id="modalProduct" class="modal fade" tabindex="-1">
+    <form id="postProduct" action="{{url_for('abm_products.post_product')}}" method="POST" enctype="multipart/form-data">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nuevo producto</h5>
+                    <button form="postProduct" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div name="SKUID" class="mb-3">
+                        <label for="SKUID" class="form-label">SKU</label>
+                        <input form="postProduct" name="SKUID" id="SKUID" class="form-control"  readonly></input>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <input form="postProduct" required name="descripcion" type="text" class="form-control" id="descripcion">
+                    </div>
+                    <div class="mb-3">
+                        <label for="img" class="form-label">Imagen</label>
+                        <input form="postProduct" name="img" type="file" class="form-control" id="img">
+                    </div>
+                    <div class="mb-3">
+                        <label for="precio" class="form-label">Precio $</label>
+                        <input form="postProduct" required name="precio" type="number" class="form-control" step=".01" id="precio">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button form="postProduct" type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+                    <button form="postProduct" type="submit" class="btn btn-dark">Guardar producto</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+{% endblock %}
+
+
